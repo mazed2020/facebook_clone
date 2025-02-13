@@ -1,8 +1,9 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv"
 import userRouter from "./routes/user.routers.js";
+import connectDB from "./db/connectionDB.js";
 dotenv.config({
     path: './.env'
 })
@@ -15,14 +16,21 @@ app.use(cors({
     exposedHeaders: ["Set-Cookie"]
 }));
 
-app.use(express.json());
+app.use([express.json(),express.urlencoded({extended:true})]);
 
 app.use(cookieParser());
 
 // Add your routes here
 app.use('/api/v1/users', userRouter);
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+connectDB().then(()=>{
+    app.listen(process.env.PORT,()=>{
+        console.log(`apps running on ${process.env.PORT}`);
+    }) 
+}).catch((err)=>{
+    console.log(`db connenction error is ${err}`);
+
+})
 
 
 
